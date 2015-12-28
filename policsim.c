@@ -97,6 +97,7 @@ static struct state states[MAXSTATES];
 
 // FUNCTION DEFINITIONS
 int main(int argc, char *argv[]) {
+  srand(time(NULL));
   int i;
   for(i = 0; i < MAXSTATES; i++)
     states[i] = createState("DEAD", 0, 0, 0);
@@ -322,6 +323,7 @@ void turn(struct state *state) {
     int index = indexOfMax((*state).popNums);
     int direction = ((*state).population - ((*state).popNums).nums[index] >= 0) ? 1 : -1; // Continue trend or discontinue trend.
     double aggDif = (*state).aggressiveness - ((*state).aggNums).nums[index];
+    printf("AGG DIFF FOR %s is %f\n", state->name, aggDif);
     double newAggressiveness = (*state).aggressiveness + (direction * aggDif * STRATEGYMODIFIER);
 
     // Make sure aggressiveness is within bounds.    
