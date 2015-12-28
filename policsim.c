@@ -323,7 +323,9 @@ void turn(struct state *state) {
     int index = indexOfMax((*state).popNums);
     int direction = ((*state).population - ((*state).popNums).nums[index] >= 0) ? 1 : -1; // Continue trend or discontinue trend.
     double aggDif = (*state).aggressiveness - ((*state).aggNums).nums[index];
-    printf("AGG DIFF FOR %s is %f\n", state->name, aggDif);
+
+    printf("%s: CURRENT AG: %f \t INDEX: %d \t AGG AT LOC: %f \t aggDIF: %f\n", state->name, state->aggressiveness, index, (state->aggNums).nums[index], aggDif);
+
     double newAggressiveness = (*state).aggressiveness + (direction * aggDif * STRATEGYMODIFIER);
 
     // Make sure aggressiveness is within bounds.    
@@ -355,7 +357,7 @@ struct pMem createP() {
 }
 
 void addPMem(long int num, struct pMem *mem) {
-  if((*mem).index == MEMSIZE - 1)
+  if((*mem).index > MEMSIZE - 1)
     (*mem).index = 0;
   (*mem).nums[(*mem).index] = num;
   ((*mem).index)++;
@@ -365,7 +367,7 @@ void addPMem(long int num, struct pMem *mem) {
 int size(struct pMem mem) {
   int n, sz;
   
-  for(n = 0, sz = 0; n <= MEMSIZE; n++) {
+  for(n = 0, sz = 0; n < MEMSIZE; n++) {
     if(mem.nums[n] != EMPTYARRAY)
       sz++;
   }
@@ -376,7 +378,7 @@ int size(struct pMem mem) {
 int indexOfMax(struct pMem mem) {
   int n, index, max;
   
-  for(n = 0, index = 0, max = -9999999; n <= MEMSIZE; n++) {
+  for(n = 0, index = -1, max = -9999999; n < MEMSIZE; n++) {
     if(mem.nums[n] >= max)
       index = n;
   }
@@ -398,7 +400,7 @@ struct aMem createA() {
 }
 
 void addAMem(double num, struct aMem *mem) {
-  if((*mem).index == MEMSIZE - 1)
+  if((*mem).index > MEMSIZE - 1)
     (*mem).index = 0;
   (*mem).nums[(*mem).index] = num;
   ((*mem).index)++;
