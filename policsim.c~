@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+/*
+
+  Structure:
+  Past five population numbers (Queue would be great).
+  Past five aggressiveness numbers.
+  Aggressiveness
+  Population
+  Fertility
+
+  Process:
+  Random Action { Invade,  }
+ */
+
+struct state {
+  
+  long int population;
+  double aggressiveness;
+  double fertility;
+};
+
+struct queue {
+};
