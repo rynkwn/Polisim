@@ -31,7 +31,7 @@
 enum {TRUE = 1, FALSE = 0};
 
 // CONSTANTS
-static const double POWERRATIO = 1.25; // The population difference, expressed as a ratio, between an attacker and a defender that's sufficient to induce an attack.
+static const double POWERRATIO = 2.00; // The population difference, expressed as a ratio, between an attacker and a defender that's sufficient to induce an attack.
 static const double POPLOSS = .6; // The percentage population of the defending country that is destroyed. Removed from both sides.
 static const double FERTTAKEN  = .2; // Fertility taken by the aggressor
 static const double FERTDESTROYED = .4; // Fertility simply lost by the defender.
@@ -43,6 +43,8 @@ static const double STRATEGYMODIFIER = .5; // A modifier showing how quickly or 
 
 static const int OPENNESS_TO_STATREGY_EXPERIMENTATION = 4; // Higher numbers lead to greater absolute value in strategy changes. If too high, no consistent strategy. If too low, experiments slowly. If 0, no aggression change.
 static const double MINIMUM_STRATEGY_CHANGE = .1; // Minimum strategy change.
+
+static const long int POP_SUPPORTED_BY_ONE_FERTILITY = 2000000; // The amount of population supported by a single unit of fertility. If current pop is less than this, will increase. Otherwise, will either be stable or decrease.
 
 // FUNCTIONS
 struct pMem createP();
@@ -318,8 +320,11 @@ void randomEv(struct state *state) {
 void turn(struct state *state) {
   long int pop = (*state).population;
   double fertility = (*state).fertility;
+
+  long int popMax = POP_SUPPORTED_BY_ONE_FERTILITY * fertility;
+  double percentGrowth = (double) (popMax - pop) / popMax;
   
-  (*state).population = pop * fertility;
+  (*state).population = pop * (1 + percentGrowth);
 
   // Reconfigure aggressiveness based on past success.
   if(size((*state).popNums) == MEMSIZE) {
@@ -332,7 +337,7 @@ void turn(struct state *state) {
     // If the aggression difference is 0, inject some randomness.
     if(aggDif == 0.0) { aggExperiment = (double) (random() % OPENNESS_TO_STATREGY_EXPERIMENTATION) / 100; }
     // If the aggression difference is too small to be meaningful, amplify.
-    if(aggDif < MINIMUM_STRATEGY_CHANGE) { aggModifier = (double) MINIMUM_STRATEGY_CHANGE * direction; }
+    if(aggDif < MINIMUM_STRATEGY_CHANGE && aggDif > 0) { aggModifier = (double) MINIMUM_STRATEGY_CHANGE * direction; }
 
     double newAggressiveness = (*state).aggressiveness + (direction * aggDif * STRATEGYMODIFIER) + aggExperiment + aggModifier;
 
