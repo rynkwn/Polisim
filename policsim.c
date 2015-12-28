@@ -41,6 +41,9 @@ static const double SECESSIONCHANCE = .02;
 static const double BOUNTYCHANCE = .03;
 static const double STRATEGYMODIFIER = .5; // A modifier showing how quickly or slowly a state changes its aggressiveness.
 
+static const int OPENNESS_TO_STATREGY_EXPERIMENTATION = 4; // Higher numbers lead to greater absolute value in strategy changes. If too high, no consistent strategy. If too low, experiments slowly. If 0, no aggression change.
+static const double MINIMUM_STRATEGY_CHANGE = .1; // Minimum strategy change.
+
 // FUNCTIONS
 struct pMem createP();
 struct aMem createA();
@@ -303,7 +306,7 @@ void randomEv(struct state *state) {
 
   rand = random() % 100;
   if(rand <= 100 * BOUNTYCHANCE) {
-    double gain = ((random() % 10) + 1) / 100;
+    double gain = (double) ((random() % 10) + 1) / 100;
 
     printf("NEW TECHNOLOGY IMPROVES FERTILITY IN %s: GAINS MEASURED AT %f\n", (*state).name, gain);
 
@@ -322,11 +325,16 @@ void turn(struct state *state) {
   if(size((*state).popNums) == MEMSIZE) {
     int index = indexOfMax((*state).popNums);
     int direction = ((*state).population - ((*state).popNums).nums[index] >= 0) ? 1 : -1; // Continue trend or discontinue trend.
-    double aggDif = (*state).aggressiveness - ((*state).aggNums).nums[index];
+    double aggDif = (*state).aggressiveness - (state->aggNums).nums[index];
+    double aggExperiment = 0; // Used to modify aggression if aggDif is 0.
+    double aggModifier = 0; // Used to amplify aggression changes.
 
-    printf("%s: CURRENT AG: %f \t INDEX: %d \t AGG AT LOC: %f \t aggDIF: %f\n", state->name, state->aggressiveness, index, (state->aggNums).nums[index], aggDif);
+    // If the aggression difference is 0, inject some randomness.
+    if(aggDif == 0.0) { aggExperiment = (double) (random() % OPENNESS_TO_STATREGY_EXPERIMENTATION) / 100; }
+    // If the aggression difference is too small to be meaningful, amplify.
+    if(aggDif < MINIMUM_STRATEGY_CHANGE) { aggModifier = (double) MINIMUM_STRATEGY_CHANGE * direction; }
 
-    double newAggressiveness = (*state).aggressiveness + (direction * aggDif * STRATEGYMODIFIER);
+    double newAggressiveness = (*state).aggressiveness + (direction * aggDif * STRATEGYMODIFIER) + aggExperiment + aggModifier;
 
     // Make sure aggressiveness is within bounds.    
     if(newAggressiveness < 0) {
@@ -379,8 +387,10 @@ int indexOfMax(struct pMem mem) {
   int n, index, max;
   
   for(n = 0, index = -1, max = -9999999; n < MEMSIZE; n++) {
-    if(mem.nums[n] >= max)
+    if(mem.nums[n] >= max){
       index = n;
+      max = mem.nums[n];
+    }
   }
   return index;
 }
