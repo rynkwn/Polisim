@@ -6,15 +6,13 @@
   UTILITY FUNCTIONS
  */
 
-void randStr(char *dest, int length) {
-  char charset[] = "abcdefghijlmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  
-  while (length-- > 0) {
-    int index = (double) rand() / RAND_MAX * (sizeof charset - 1);
-    *dest++ = charset[index];
-  }
-  *dest = '\0';
+// Selects a random country name and then adds it to dest.
+void randName(char *dest) {
+  int index = (int) rand() % 65;
+
+  char *name = COUNTRY_NAMES[index];
+
+  strCpy(dest, name);
 }
 
 // Copy from into dest, while maintaining dest's size.

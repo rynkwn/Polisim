@@ -26,7 +26,7 @@
 
 #define MAXSTATES 100
 #define MEMSIZE 5
-#define MAXNAMESIZE 15
+#define MAXNAMESIZE 70
 #define EMPTY 0 // If states[i] is EMPTY , it's considered empty.
 #define EMPTYARRAY -1 // If a mem has an array value of EMPTYARRAY, it is considered empty there.
 
@@ -128,7 +128,8 @@ void showAll() {
   for(i = 0; i < MAXSTATES; i++) {
     if(states[i].population > EMPTY){
       struct state temp = states[i];
-      printf("%s -\t Pop: %ld\t Aggr: %f\t Fert: %f\n", temp.name, temp.population, temp.aggressiveness, temp.fertility);
+      printf("%s\n", temp.name);
+      printf("Pop: %ld\t Aggr: %f\t Fert: %f\n\n", temp.population, temp.aggressiveness, temp.fertility);
     }
   }
 }
@@ -194,7 +195,7 @@ void addState(long int pop, double ag, double fer) {
       char name[MAXNAMESIZE];
       // int rand = random() % MAXNAMESIZE + (MAXNAMESIZE/3);
       // DEPRECATED. ALL NAMES WILL HAVE EQUAL SIZES.
-      randStr(name, MAXNAMESIZE);
+      randName(name);
 
       struct state temp = createState(name, pop, ag, fer);
       states[i] = temp;
