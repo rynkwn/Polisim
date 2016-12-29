@@ -7,6 +7,8 @@
 #include <stdio.h> // Desired for output.
 #include <stdlib.h> // Desired for Random function
 #include <unistd.h> // Desired for sleep function
+#include "util.h"
+#include "constants.h"
 
 /*
   STRUCTURE STATE:
@@ -30,30 +32,10 @@
 
 enum {TRUE = 1, FALSE = 0};
 
-// CONSTANTS
-static const double POWERRATIO = 2.00; // The population difference, expressed as a ratio, between an attacker and a defender that's sufficient to induce an attack.
-static const double POPLOSS = .6; // The percentage population of the defending country that is destroyed. Removed from both sides.
-static const double FERTTAKEN  = .2; // Fertility taken by the aggressor
-static const double FERTDESTROYED = .4; // Fertility simply lost by the defender.
-static const double IMPROVEEFFICIENCY = 1.10; // Fertility is increased by this multiple when self-improvement actions are taken.
-static const double DISEASECHANCE = .03;
-static const double SECESSIONCHANCE = .02;
-static const double BOUNTYCHANCE = .03;
-static const double STRATEGYMODIFIER = .5; // A modifier showing how quickly or slowly a state changes its aggressiveness.
-
-static const int OPENNESS_TO_STATREGY_EXPERIMENTATION = 4; // Higher numbers lead to greater absolute value in strategy changes. If too high, no consistent strategy. If too low, experiments slowly. If 0, no aggression change.
-static const double MINIMUM_STRATEGY_CHANGE = .1; // Minimum strategy change.
-
-static const long int POP_SUPPORTED_BY_ONE_FERTILITY = 2000000; // The amount of population supported by a single unit of fertility. If current pop is less than this, will increase. Otherwise, will either be stable or decrease.
-
 // FUNCTIONS
 struct pMem createP();
 struct aMem createA();
 struct state createState(char *name, long int pop, double ag, double fer);
-
-// Utility functions
-void randStr(char *dest, int length); // Basically stolen from Seb, Stack Overflow, due to my own disinterest in writing this out by hand at 4 in the morning.
-void strCpy(char *dest, char *from); // Copy from into dest, while maintaining dest's size.
 
 // Functions mediating between states.
 void showAll(); // Print a brief description of all states.
@@ -134,30 +116,6 @@ int main(int argc, char *argv[]) {
   }
 
   return 0;
-}
-
-/*
-  UTILITY FUNCTIONS
- */
-
-void randStr(char *dest, int length) {
-  char charset[] = "abcdefghijlmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  
-  while (length-- > 0) {
-    int index = (double) rand() / RAND_MAX * (sizeof charset - 1);
-    *dest++ = charset[index];
-  }
-  *dest = '\0';
-}
-
-// Copy from into dest, while maintaining dest's size.
-// ASSUMES FROM HAS SIZE <= DEST.
-void strCpy(char *dest, char *from) {
-  while(*from != '\0')
-    *dest++ = *from++;
-  while(*dest != '\0')
-    *dest++ = ' ';
 }
 
 /*
